@@ -2,8 +2,10 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -12,7 +14,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gorilla/handlers"
 )
@@ -38,7 +39,21 @@ func main() {
 // This replaces all occurrences of http://releases.hashicorp.com with
 // config.ReleaseProxyHost in the response body
 func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err error) {
-	b, err := ioutil.ReadAll(resp.Body)
+	// Check that the server actually sent compressed data
+	var reader io.ReadCloser
+	switch resp.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err = gzip.NewReader(resp.Body)
+		resp.Header.Del("Content-Encoding")
+		resp.Header.Del("Content-Length")
+		resp.ContentLength = -1
+		resp.Uncompressed = true
+		defer reader.Close()
+	default:
+		reader = resp.Body
+	}
+
+	b, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return err
 	}
@@ -46,6 +61,8 @@ func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err
 	if err = resp.Body.Close(); err != nil {
 		return err
 	}
+
+	fmt.Printf("Response Body: %+v\n", string(b))
 
 	replacement := fmt.Sprintf("https://%s", config.ReleaseProxyHost)
 
@@ -65,7 +82,6 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 			req.Host = "registry.terraform.io"
 			req.Header.Set("User-Agent", "Terraform/1.1.7")
 			req.Header.Set("X-Terraform-Version", "1.1.7")
-			req.Header.Set("Accept-Encoding", "")
 		} else if req.Host == config.ReleaseProxyHost {
 			req.URL.Scheme = "https"
 			req.URL.Host = "releases.hashicorp.com"
@@ -95,24 +111,9 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 		return nil
 	}
 
-	transport := &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: defaultTransportDialContext(&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}),
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		DisableCompression:    true,
-	}
-
 	return &httputil.ReverseProxy{
 		Director:       director,
 		ModifyResponse: responseDirector,
-		Transport:      transport,
 	}
 }
 
