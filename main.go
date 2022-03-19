@@ -74,6 +74,7 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 			req.Host = "releases.hashicorp.com"
 			req.Header.Set("User-Agent", "Terraform/1.1.7")
 		}
+		req.Header.Set("Accept-Encoding", "")
 	}
 
 	responseDirector := func(res *http.Response) error {
