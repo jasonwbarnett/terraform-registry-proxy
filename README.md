@@ -28,14 +28,14 @@ This application is intended to be put behind a web server, e.g. [NGINX][1], [Ca
 
 Two possible usages:
 
-1. Without external artifact storage (e.g. Artifactory)
-2. With external artifact storage (e.g. Artifactory)
+1. Without external artifact storage
+2. With external artifact storage
 
 Read each section below for more details
 
-### Without external artifact storage (e.g. Artifactory)
+### Without external artifact storage
 
-### With external artifact storage (e.g. Artifactory)
+### With external artifact storage
 
 [1]: https://nginx.org/en/
 [2]: https://caddyserver.com/
