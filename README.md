@@ -33,7 +33,9 @@ Two possible usages:
 1. Without external artifact storage
 2. With external artifact storage
 
-Read each section below for more details
+Read each section below for more details. We will use [Artifactory][4] as our example
+artifact storage and the Caddy web server for our examples as well, but any web
+server or artifact storage should work.
 
 ### Without external artifact storage
 
@@ -53,3 +55,4 @@ Read each section below for more details
 [1]: https://nginx.org/en/
 [2]: https://caddyserver.com/
 [3]: https://httpd.apache.org/
+[4]: https://jfrog.com/artifactory/
