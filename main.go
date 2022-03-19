@@ -3,11 +3,9 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
-	"context"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -92,7 +90,10 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 
 	responseDirector := func(res *http.Response) error {
 		if server := res.Header.Get("Server"); strings.HasPrefix(server, "terraform-registry") {
-			rewriteBody(config, res)
+			if err := rewriteBody(config, res); err != nil {
+				fmt.Println("Error rewriting body!")
+				return err
+			}
 		}
 
 		if location := res.Header.Get("Location"); location != "" {
@@ -115,8 +116,4 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 		Director:       director,
 		ModifyResponse: responseDirector,
 	}
-}
-
-func defaultTransportDialContext(dialer *net.Dialer) func(context.Context, string, string) (net.Conn, error) {
-	return dialer.DialContext
 }
