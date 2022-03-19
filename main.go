@@ -55,16 +55,14 @@ func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err
 
 func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-		if req.URL.Host == config.RegistryProxyHost {
+		if req.Host == config.RegistryProxyHost {
 			req.URL.Scheme = "https"
 			req.URL.Host = "registry.terraform.io"
-			req.Host = req.URL.Host
 			req.Header.Set("X-Terraform-Version", "1.1.7")
 			req.Header.Set("User-Agent", "Terraform/1.1.7")
 		} else if req.URL.Host == config.ReleaseProxyHost {
 			req.URL.Scheme = "https"
 			req.URL.Host = "releases.hashicorp.com"
-			req.Host = req.URL.Host
 			req.Header.Set("User-Agent", "Terraform/1.1.7")
 		}
 	}
