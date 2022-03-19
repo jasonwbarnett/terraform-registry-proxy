@@ -10,8 +10,8 @@ see in an Artifactory so that you don't have to cache the plugins and unzip them
 Instead just let the `terraform` cli natively fetch things on-demand in an
 environment where direct internet access is not possible.
 
-This application is intended to be put behind a web server, e.g. NGINX, Caddy,
-Apache, etc. This gives you flexibility to use whichever webserver you want.
+This application is intended to be put behind a web server, e.g. [NGINX][1], [Caddy][2],
+[Apache][3], etc. This gives you flexibility to use whichever webserver you want.
 
 ## Requirements
 
@@ -36,3 +36,7 @@ Read each section below for more details
 ### Without external artifact storage (e.g. Artifactory)
 
 ### With external artifact storage (e.g. Artifactory)
+
+[1]: https://nginx.org/en/
+[2]: https://caddyserver.com/
+[3]: https://httpd.apache.org/
