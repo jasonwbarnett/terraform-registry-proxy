@@ -13,6 +13,17 @@ environment where direct internet access is not possible.
 This application is intended to be put behind a web server, e.g. [NGINX][1], [Caddy][2],
 [Apache][3], etc.
 
+## How does it work?
+
+The tiny reverse proxy app is really quite simple and does two things:
+
+1. Proxies requests to https://registry.terraform.io and https://releases.hashicorp.com (optionally, if not using external storage)
+2. Re-write response bodies to update where Artifacts should be fetched from (configurable).
+   - For example, it will replace:
+     - original url: `https://releases.hashicorp.com/terraform-provider-azurerm/2.97.0/terraform-provider-azurerm_2.97.0_darwin_amd64.zip
+     - re-written to: `https://hashicorp-releases.company.com/terraform-provider-azurerm/2.97.0/terraform-provider-azurerm_2.97.0_darwin_amd64.zip`
+     - or with Artifactory re-written to: `https://artifactory.company.com/artifactory/hashicorp-releases/terraform-provider-azurerm/2.97.0/terraform-provider-azurerm_2.97.0_darwin_amd64.zip`
+
 ## Requirements
 
 - web server binding on TCP/443
