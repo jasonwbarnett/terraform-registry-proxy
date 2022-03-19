@@ -41,7 +41,7 @@ func main() {
 		RegistryProxyHost: registryHost,
 		ReleaseProxyHost:  releaseHost,
 	}
-	proxy := NewWebReverseProxy(config)
+	proxy := config.NewWebReverseProxy()
 	http.Handle("/", handlers.LoggingHandler(os.Stdout, proxy))
 
 	// Start the server
@@ -50,7 +50,7 @@ func main() {
 
 // This replaces all occurrences of http://releases.hashicorp.com with
 // config.ReleaseProxyHost in the response body
-func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err error) {
+func (config *WebReverseProxyConfiguration) rewriteBody(resp *http.Response) (err error) {
 	// Check that the server actually sent compressed data
 	var reader io.ReadCloser
 	switch resp.Header.Get("Content-Encoding") {
@@ -84,7 +84,7 @@ func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err
 	return nil
 }
 
-func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseProxy {
+func (config *WebReverseProxyConfiguration) NewWebReverseProxy() *httputil.ReverseProxy {
 	director := func(req *http.Request) {
 		if req.Host == config.RegistryProxyHost {
 			req.URL.Scheme = "https"
@@ -102,7 +102,7 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 
 	responseDirector := func(res *http.Response) error {
 		if server := res.Header.Get("Server"); strings.HasPrefix(server, "terraform-registry") {
-			if err := rewriteBody(config, res); err != nil {
+			if err := config.rewriteBody(res); err != nil {
 				fmt.Println("Error rewriting body!")
 				return err
 			}
