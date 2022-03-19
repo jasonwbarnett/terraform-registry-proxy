@@ -30,7 +30,7 @@ The tiny reverse proxy app is really quite simple and does two things:
 - ssl certificate(s) that is/are trusted by the client where `terraform` is
   being run
 - dns record dedicated to terraform registry proxy (e.g. `terraform-registry.company.com`)
-
+- update sources in your terraform configurations
 
 ### Optionally
 
@@ -65,6 +65,47 @@ server or artifact storage should work.
 ./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
                                    -release-proxy-host artifactory.company.com \
                                    -release-proxy-path-prefix /artifactory/hashicorp-releases
+```
+
+### Update sources in Terraform configurations
+
+After you have your infrastructure setup you need to update your Terraform
+configuration so it knows to pull dependencies through the proxy.
+
+Say for example this is your original configuration:
+
+```terraform
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=2.97.0"
+    }
+  }
+}
+
+# Configure the Microsoft Azure Provider
+provider "azurerm" {
+  features {}
+}
+```
+
+You would update it to this
+
+```terraform
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "terraform-registry.company.com/hashicorp/azurerm"
+      version = "=2.97.0"
+    }
+  }
+}
+
+# Configure the Microsoft Azure Provider
+provider "azurerm" {
+  features {}
+}
 ```
 
 [1]: https://nginx.org/en/
