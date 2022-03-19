@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"strconv"
+
+	"github.com/gorilla/handlers"
 )
 
 // WebReverseProxyConfiguration is a coniguration for the ReverseProxy
@@ -22,10 +25,10 @@ func main() {
 		ReleaseProxyHost:  "release.local",
 	}
 	proxy := NewWebReverseProxy(config)
-	http.Handle("/", proxy)
+	http.Handle("/", handlers.LoggingHandler(os.Stdout, proxy))
 
 	// Start the server
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8555", nil)
 }
 
 // This replaces all occurrences of http://releases.hashicorp.com with
