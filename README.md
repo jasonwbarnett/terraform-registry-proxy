@@ -63,6 +63,12 @@ to get familiar with how it works.
 
 ### With external artifact storage
 
+In this scenario both https://registry.terraform.io and
+https://releases.hashicorp.com are proxied through this app.
+
+You will need to setup two DNS records pointing to the web server where
+`terraform-registry-reverse-proxy` is running.
+
 ![with artifact storage](/docs/diagrams/with-artifact-storage.drawio.png?raw=true)
 
 ```bash
