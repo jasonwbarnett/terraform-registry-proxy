@@ -1,21 +1,25 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"strings"
+	"strconv"
 )
 
 // WebReverseProxyConfiguration is a coniguration for the ReverseProxy
 type WebReverseProxyConfiguration struct {
-	ProxyHost string
+	RegistryProxyHost string
+	ReleaseProxyHost  string
 }
 
 func main() {
 	config := &WebReverseProxyConfiguration{
-		ProxyHost: "127.0.0.1:8080",
+		RegistryProxyHost: "registry.local",
+		ReleaseProxyHost:  "release.local",
 	}
 	proxy := NewWebReverseProxy(config)
 	http.Handle("/", proxy)
@@ -24,21 +28,26 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
-func pullDomainAndPath(a string) (domain string, path string) {
-	data := strings.Split(a, "/")
-	domain = data[1]
-	path = "/" + strings.Join(data[2:], "/")
-
-	return domain, path
-}
-
-func convertURLToProxy(config *WebReverseProxyConfiguration, u *url.URL) string {
-	newURL := "http://" + config.ProxyHost + u.Path
-	if u.RawQuery != "" {
-		newURL = newURL + "?" + u.RawQuery
+// This replaces all occurrences of http://releases.hashicorp.com with
+// config.ReleaseProxyHost in the response body
+func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err error) {
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
 	}
 
-	return newURL
+	if err = resp.Body.Close(); err != nil {
+		return err
+	}
+
+	replacement := fmt.Sprintf("https://%s", config.ReleaseProxyHost)
+
+	b = bytes.ReplaceAll(b, []byte("https://releases.hashicorp.com"), []byte(replacement)) // releases
+	body := ioutil.NopCloser(bytes.NewReader(b))
+	resp.Body = body
+	resp.ContentLength = int64(len(b))
+	resp.Header.Set("Content-Length", strconv.Itoa(len(b)))
+	return nil
 }
 
 func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseProxy {
@@ -46,13 +55,12 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 		req.URL.Scheme = "https"
 		req.URL.Host = "registry.terraform.io"
 		req.Host = req.URL.Host
-		if _, ok := req.Header["User-Agent"]; !ok {
-			// explicitly disable User-Agent so it's not set to default value
-			req.Header.Set("User-Agent", "")
-		}
+		req.Header.Set("X-Terraform-Version", "1.1.7") // only for registry, do not apply to releases mirror
+		req.Header.Set("User-Agent", "Terraform/1.1.7")
 	}
 
 	responseDirector := func(res *http.Response) error {
+		rewriteBody(config, res)
 		if location := res.Header.Get("Location"); location != "" {
 			url, err := url.ParseRequestURI(location)
 			if err != nil {
@@ -61,7 +69,7 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 			}
 
 			// Override redirect url Host with ProxyHost
-			url.Host = config.ProxyHost
+			url.Host = config.RegistryProxyHost
 
 			res.Header.Set("Location", url.String())
 			res.Header.Set("X-Reverse-Proxy", "terraform-registry-reverse-proxy")
