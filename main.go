@@ -66,15 +66,15 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 			req.URL.Scheme = "https"
 			req.URL.Host = "registry.terraform.io"
 			req.Host = "registry.terraform.io"
-			req.Header.Set("X-Terraform-Version", "1.1.7")
 			req.Header.Set("User-Agent", "Terraform/1.1.7")
+			req.Header.Set("X-Terraform-Version", "1.1.7")
+			req.Header.Set("Accept-Encoding", "")
 		} else if req.Host == config.ReleaseProxyHost {
 			req.URL.Scheme = "https"
 			req.URL.Host = "releases.hashicorp.com"
 			req.Host = "releases.hashicorp.com"
 			req.Header.Set("User-Agent", "Terraform/1.1.7")
 		}
-		req.Header.Set("Accept-Encoding", "")
 	}
 
 	responseDirector := func(res *http.Response) error {
