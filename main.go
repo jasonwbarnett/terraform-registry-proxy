@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -74,7 +75,10 @@ func NewWebReverseProxy(config *WebReverseProxyConfiguration) *httputil.ReverseP
 	}
 
 	responseDirector := func(res *http.Response) error {
-		rewriteBody(config, res)
+		if server := res.Header.Get("Server"); strings.HasPrefix(server, "terraform-registry") {
+			rewriteBody(config, res)
+		}
+
 		if location := res.Header.Get("Location"); location != "" {
 			url, err := url.ParseRequestURI(location)
 			if err != nil {
