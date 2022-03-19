@@ -48,6 +48,10 @@ Read each section below for more details. We will use [Artifactory][4] as our ex
 artifact storage and the Caddy web server for our examples as well, but any web
 server or artifact storage should work.
 
+These diagrams are not intended to be recommendations for specific architectures
+but simply showing you examples of possible ways to set it up to make it easier
+to get familiar with how it works.
+
 ### Without external artifact storage
 
 ![with artifact storage](/docs/diagrams/without-artifact-storage.drawio.png?raw=true)
