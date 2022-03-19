@@ -11,7 +11,7 @@ Instead just let the `terraform` cli natively fetch things on-demand in an
 environment where direct internet access is not possible.
 
 This application is intended to be put behind a web server, e.g. [NGINX][1], [Caddy][2],
-[Apache][3], etc. This gives you flexibility to use whichever webserver you want.
+[Apache][3], etc.
 
 ## Requirements
 
