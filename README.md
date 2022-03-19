@@ -26,7 +26,7 @@ The tiny reverse proxy app is really quite simple and does two things:
 
 ## Requirements
 
-- web server binding on TCP/443
+- web server
 - ssl certificate(s) that is/are trusted by the client where `terraform` is
   being run
 - dns record dedicated to terraform registry proxy (e.g. `terraform-registry.company.com`)
