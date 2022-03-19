@@ -37,6 +37,18 @@ func init() {
 	flag.StringVar(&releasePathPrefix, "release-proxy-path-prefix", "", "The prefix path to prepend to any release artifact paths. This might be /artifactory/hashicorp-releases")
 	flag.StringVar(&httpAddress, "http-address", ":8555", "HTTP address to listen on, e.g. :8080 or 127.0.0.1:8080")
 	flag.Parse()
+
+	if registryHost == "" {
+		fmt.Printf("You must provide a -registry-proxy-host value\n\n")
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	if releaseHost == "" {
+		fmt.Printf("You must provide a -release-proxy-host value\n\n")
+		flag.Usage()
+		os.Exit(1)
+	}
 }
 
 func main() {
