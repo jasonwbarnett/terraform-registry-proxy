@@ -15,14 +15,16 @@ This application is intended to be put behind a web server, e.g. [NGINX][1], [Ca
 
 ## Requirements
 
-- web server
+- web server binding on TCP/443
 - ssl certificate(s) that is/are trusted by the client where `terraform` is
   being run
+- dns record dedicated to terraform registry proxy (e.g. `terraform-registry.company.com`)
 
 
 ### Optionally
 
 - artifact storage (e.g. Artifactory)
+- dns record dedicated to hashicorp releases proxy (e.g. `hashicorp-releases.company.com`)
 
 ## Usage
 
