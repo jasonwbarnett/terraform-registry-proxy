@@ -21,17 +21,20 @@ import (
 type WebReverseProxyConfiguration struct {
 	RegistryProxyHost string
 	ReleaseProxyHost  string
+	ReleasePathPrefix string
 }
 
 var (
-	registryHost string
-	releaseHost  string
-	httpAddress  string
+	registryHost      string
+	releaseHost       string
+	releasePathPrefix string
+	httpAddress       string
 )
 
 func init() {
 	flag.StringVar(&registryHost, "registry-proxy-host", "", "FQDN of registry proxy host [Required]")
 	flag.StringVar(&releaseHost, "release-proxy-host", "", "FQDN of release proxy host [Required]")
+	flag.StringVar(&releasePathPrefix, "release-proxy-path-prefix", "", "The prefix path to prepend to any release artifact paths. This might be /artifactory/hashicorp-releases")
 	flag.StringVar(&httpAddress, "http-address", ":8555", "HTTP address to listen on, e.g. :8080 or 127.0.0.1:8080")
 	flag.Parse()
 }
@@ -40,6 +43,7 @@ func main() {
 	config := &WebReverseProxyConfiguration{
 		RegistryProxyHost: registryHost,
 		ReleaseProxyHost:  releaseHost,
+		ReleasePathPrefix: releasePathPrefix,
 	}
 	proxy := config.NewWebReverseProxy()
 	http.Handle("/", handlers.LoggingHandler(os.Stdout, proxy))
@@ -74,7 +78,7 @@ func (config *WebReverseProxyConfiguration) rewriteBody(resp *http.Response) (er
 		return err
 	}
 
-	replacement := fmt.Sprintf("https://%s", config.ReleaseProxyHost)
+	replacement := fmt.Sprintf("https://%s%s", config.ReleaseProxyHost, config.ReleasePathPrefix)
 
 	b = bytes.ReplaceAll(b, []byte("https://releases.hashicorp.com"), []byte(replacement)) // releases
 	body := ioutil.NopCloser(bytes.NewReader(b))
