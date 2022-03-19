@@ -37,7 +37,18 @@ Read each section below for more details
 
 ### Without external artifact storage
 
+```
+./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
+                                   -release-proxy-host hashicorp-releases.company.com
+```
+
 ### With external artifact storage
+
+```
+./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
+                                   -release-proxy-host artifactory.company.com \
+                                   -release-proxy-path-prefix /artifactory/hashicorp-releases
+```
 
 [1]: https://nginx.org/en/
 [2]: https://caddyserver.com/
