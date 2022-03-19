@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"compress/gzip"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -22,16 +23,29 @@ type WebReverseProxyConfiguration struct {
 	ReleaseProxyHost  string
 }
 
+var (
+	registryHost string
+	releaseHost  string
+	httpAddress  string
+)
+
+func init() {
+	flag.StringVar(&registryHost, "registry-proxy-host", "", "FQDN of registry proxy host [Required]")
+	flag.StringVar(&releaseHost, "release-proxy-host", "", "FQDN of release proxy host [Required]")
+	flag.StringVar(&httpAddress, "http-address", ":8555", "HTTP address to listen on, e.g. :8080 or 127.0.0.1:8080")
+	flag.Parse()
+}
+
 func main() {
 	config := &WebReverseProxyConfiguration{
-		RegistryProxyHost: "registry.local",
-		ReleaseProxyHost:  "release.local",
+		RegistryProxyHost: registryHost,
+		ReleaseProxyHost:  releaseHost,
 	}
 	proxy := NewWebReverseProxy(config)
 	http.Handle("/", handlers.LoggingHandler(os.Stdout, proxy))
 
 	// Start the server
-	http.ListenAndServe(":8555", nil)
+	http.ListenAndServe(httpAddress, nil)
 }
 
 // This replaces all occurrences of http://releases.hashicorp.com with
