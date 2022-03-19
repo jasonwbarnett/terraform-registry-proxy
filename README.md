@@ -39,12 +39,16 @@ server or artifact storage should work.
 
 ### Without external artifact storage
 
+![with artifact storage](/docs/diagrams/without-artifact-storage.drawio.png?raw=true)
+
 ```bash
 ./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
                                    -release-proxy-host hashicorp-releases.company.com
 ```
 
 ### With external artifact storage
+
+![with artifact storage](/docs/diagrams/with-artifact-storage.drawio.png?raw=true)
 
 ```bash
 ./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
