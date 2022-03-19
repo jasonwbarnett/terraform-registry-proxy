@@ -60,8 +60,6 @@ func rewriteBody(config *WebReverseProxyConfiguration, resp *http.Response) (err
 		return err
 	}
 
-	fmt.Printf("Response Body: %+v\n", string(b))
-
 	replacement := fmt.Sprintf("https://%s", config.ReleaseProxyHost)
 
 	b = bytes.ReplaceAll(b, []byte("https://releases.hashicorp.com"), []byte(replacement)) // releases
