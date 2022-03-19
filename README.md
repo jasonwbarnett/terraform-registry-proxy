@@ -1,6 +1,6 @@
 # terraform-registry-reverse-proxy
 
-This is used to proxy internal requests back to Terraform's Registry.
+This app is useful if you run Terraform in an offline / airgappped / no internet connected environment.
 
 ## What is this?
 
