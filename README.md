@@ -2,7 +2,7 @@
 
 This is used to proxy internal requests back to Terraform's Registry.
 
-# What is this?
+## What is this?
 
 Hashicorp for some reason either hasn't prioritized or outright refuses to make
 it easy to ingest Terraform providers and modules like you might traditionally
