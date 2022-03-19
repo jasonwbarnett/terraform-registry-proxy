@@ -71,6 +71,10 @@ to get familiar with how it works.
                                    -release-proxy-path-prefix /artifactory/hashicorp-releases
 ```
 
+This assumes you've configured a generic remote repository named
+`hashicorp-releases` for https://registry.terraform.io in your Artifactory
+instance.
+
 ### Update sources in Terraform configurations
 
 After you have your infrastructure setup you need to update your Terraform
