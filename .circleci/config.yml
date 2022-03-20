@@ -25,7 +25,7 @@ jobs:
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
-            - "/go/pkg/mod"
+            - "~/go/pkg/mod"
       - run:
           name: build binary
           command: |
