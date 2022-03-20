@@ -5,12 +5,13 @@ version: 2.1
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
 jobs:
-  build:
+  test:
     working_directory: ~/repo
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: golang:latest
+      - image: cimg/go:1.18
+    resource_class: medium
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -29,11 +30,28 @@ jobs:
           name: build binary
           command: |
             go build
+      - run:
+          name: setup local hosts
+          command: |
+            echo "127.0.0.1 terraform-registry.local.dev" >> /etc/hosts
+            echo "127.0.0.1 hashicorp-releases.local.dev" >> /etc/hosts
+            
+            openssl req -x509 -newkey rsa:2048 -sha256 -days 1 -nodes \
+              -keyout terraform-registry.key -out terraform-registry.crt -subj "/CN=terraform-registry.local.dev" \
+              -addext "subjectAltName=DNS:terraform-registry.local.dev,DNS:hashicorp-releases.local.dev"
+      - run:
+          name: install terraform
+          comamnd: |
+            apt update
+            apt install unzip
+            curl -LO https://releases.hashicorp.com/terraform/1.1.7/terraform_1.1.7_linux_amd64.zip
+            unzip terraform_1.1.7_linux_amd64.zip
+            chmod +x terraform
+            mv terraform /usr/local/bin
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
-    # Inside the workflow, you define the jobs you want to run.
+  end to end test:
     jobs:
-      - build
+      - test
