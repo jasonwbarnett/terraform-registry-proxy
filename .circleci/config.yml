@@ -33,11 +33,11 @@ jobs:
       - run:
           name: setup local hosts
           command: |
-            echo "127.0.0.1 terraform-registry.local.dev" >> /etc/hosts
-            echo "127.0.0.1 hashicorp-releases.local.dev" >> /etc/hosts
+            echo "127.0.0.1 terraform-registry.local.dev" | sudo tee -a /etc/hosts
+            echo "127.0.0.1 hashicorp-releases.local.dev" | sudo tee -a /etc/hosts
             
             openssl req -x509 -newkey rsa:2048 -sha256 -days 1 -nodes \
-              -keyout terraform-registry.key -out terraform-registry.crt -subj "/CN=terraform-registry.local.dev" \
+              -keyout /tmp/terraform-registry.key -out /tmp/terraform-registry.crt -subj "/CN=terraform-registry.local.dev" \
               -addext "subjectAltName=DNS:terraform-registry.local.dev,DNS:hashicorp-releases.local.dev"
       - run:
           name: install terraform
