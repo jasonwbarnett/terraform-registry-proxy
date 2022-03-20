@@ -135,7 +135,7 @@ func (config *WebReverseProxyConfiguration) NewWebReverseProxy() *httputil.Rever
 			url.Host = config.RegistryProxyHost
 
 			res.Header.Set("Location", url.String())
-			res.Header.Set("X-Reverse-Proxy", "terraform-registry-reverse-proxy")
+			res.Header.Set("X-Reverse-Proxy", "terraform-registry-proxy")
 		}
 		return nil
 	}

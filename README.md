@@ -1,4 +1,4 @@
-# terraform-registry-reverse-proxy
+# terraform-registry-proxy
 
 This app is useful if you run Terraform in an offline / airgappped / no internet connected environment.
 
@@ -17,7 +17,7 @@ This application is intended to be put behind a web server, e.g. [NGINX][1], [Ca
 
 The tiny reverse proxy app is really quite simple and does two things:
 
-1. Proxies requests to https://registry.terraform.io and https://releases.hashicorp.com (optionally, if not using external storage)
+1. Proxies requests to https://registry.terraform.io and https://releases.hashicorp.com (optionally, if not using external artifact storage)
 2. Re-write response bodies to update where Artifacts should be fetched from (configurable).
    - For example, it will replace:
      - original url: `https://releases.hashicorp.com/terraform-provider-azurerm/2.97.0/terraform-provider-azurerm_2.97.0_darwin_amd64.zip`
@@ -58,7 +58,7 @@ In this scenario both https://registry.terraform.io and
 https://releases.hashicorp.com are proxied through this app.
 
 You will need to setup two DNS records pointing to the web server where
-`terraform-registry-reverse-proxy` is running, i.e.
+`terraform-registry-proxy` is running, i.e.
 
 - `terraform-registry.company.com`
 - `hashicorp-releases.company.com`
@@ -66,7 +66,7 @@ You will need to setup two DNS records pointing to the web server where
 ![with artifact storage](/docs/diagrams/without-artifact-storage.drawio.png?raw=true)
 
 ```bash
-./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
+./terraform-registry-proxy -registry-proxy-host terraform-registry.company.com \
                                    -release-proxy-host hashicorp-releases.company.com
 ```
 
@@ -75,7 +75,7 @@ You will need to setup two DNS records pointing to the web server where
 In this scenario only https://registry.terraform.io is proxied through this app.
 
 You will need to setup one DNS record pointing to the web server where
-`terraform-registry-reverse-proxy` is running, i.e.
+`terraform-registry-proxy` is running, i.e.
 
 - `terraform-registry.company.com`
 
@@ -84,7 +84,7 @@ It also assumes you're already proxying / mirroring https://releases.hashicorp.c
 ![with artifact storage](/docs/diagrams/with-artifact-storage.drawio.png?raw=true)
 
 ```bash
-./terraform-registry-reverse-proxy -registry-proxy-host terraform-registry.company.com \
+./terraform-registry-proxy -registry-proxy-host terraform-registry.company.com \
                                    -release-proxy-host artifactory.company.com \
                                    -release-proxy-path-prefix /artifactory/hashicorp-releases
 ```

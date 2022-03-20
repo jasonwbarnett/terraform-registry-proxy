@@ -1,4 +1,4 @@
-module github.com/jasonwbarnett/terraform-registry-reverse-proxy
+module github.com/jasonwbarnett/terraform-registry-proxy
 
 go 1.17
 
