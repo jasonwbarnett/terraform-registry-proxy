@@ -15,7 +15,7 @@ This application is intended to be put behind a web server, e.g. [NGINX][1], [Ca
 
 ## How does it work?
 
-The tiny reverse proxy app is really quite simple and does two things:
+The tiny proxy app is really quite simple and does two things:
 
 1. Proxies requests to https://registry.terraform.io and https://releases.hashicorp.com (optionally, if not using external artifact storage)
 2. Re-write response bodies to update where Artifacts should be fetched from (configurable).
