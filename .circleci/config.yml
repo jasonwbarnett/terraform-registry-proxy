@@ -41,7 +41,7 @@ jobs:
               -addext "subjectAltName=DNS:terraform-registry.local.dev,DNS:hashicorp-releases.local.dev"
       - run:
           name: install terraform
-          comamnd: |
+          command: |
             apt update
             apt install unzip
             curl -LO https://releases.hashicorp.com/terraform/1.1.7/terraform_1.1.7_linux_amd64.zip
