@@ -11,7 +11,7 @@ jobs:
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
       - image: cimg/go:1.18
-    resource_class: medium
+    resource_class: small
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -37,7 +37,7 @@ jobs:
             echo "127.0.0.1 hashicorp-releases.local.dev" | sudo tee -a /etc/hosts
             
             openssl req -x509 -newkey rsa:2048 -sha256 -days 1 -nodes \
-              -keyout terraform-registry.key -out terraform-registry.crt -subj "/CN=terraform-registry.local.dev" \
+              -keyout /tmp/terraform-registry.key -out /tmp/terraform-registry.crt -subj "/CN=terraform-registry.local.dev" \
               -addext "subjectAltName=DNS:terraform-registry.local.dev,DNS:hashicorp-releases.local.dev"
       - run:
           name: install terraform
@@ -49,6 +49,24 @@ jobs:
             chmod +x terraform
             sudo mv terraform /usr/local/bin
             terraform version
+      - run:
+          name: install caddy
+          command: |
+            sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo tee /etc/apt/trusted.gpg.d/caddy-stable.asc
+            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+            sudo apt update
+            sudo apt install -y caddy
+      - run:
+          name: configure caddy
+          command: |
+            sudo \cp -f ./test/Caddyfile /etc/caddy/Caddyfile
+            sudo systemctl enable --now caddy
+      - run:
+          name: test - terraform init
+          command: |
+            cd test
+            terraform init
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
