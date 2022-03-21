@@ -1,5 +1,5 @@
 terraform-registry.dev.local, hashicorp-releases.dev.local {
   reverse_proxy /* http://localhost:8555
 
-  tls internal /tmp/terraform-registry.crt -out /tmp/terraform-registry.key
+  tls /tmp/terraform-registry.crt /tmp/terraform-registry.key
 }
