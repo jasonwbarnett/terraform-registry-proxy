@@ -35,7 +35,9 @@ jobs:
           command: |
             echo "127.0.0.1 terraform-registry.local.dev" | tee -a /etc/hosts
             echo "127.0.0.1 hashicorp-releases.local.dev" | tee -a /etc/hosts
-
+      - run:
+          name: generate ssl certificate
+          command: |
             openssl req -x509 -newkey rsa:2048 -sha256 -days 1 -nodes \
               -keyout /tmp/terraform-registry.key -out /tmp/terraform-registry.crt -subj "/CN=terraform-registry.local.dev" \
               -addext "subjectAltName=DNS:terraform-registry.local.dev,DNS:hashicorp-releases.local.dev"
