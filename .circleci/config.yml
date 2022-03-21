@@ -62,7 +62,7 @@ jobs:
           name: configure caddy
           command: |
             \cp -f ./test/Caddyfile /etc/caddy/Caddyfile
-            systemctl enable --now caddy
+            /usr/bin/caddy run --environ --config /etc/caddy/Caddyfile &
       - run:
           name: test - terraform init
           command: |
